@@ -129,7 +129,7 @@ class DQN:
                       #"Ep rwd:", int(ep_reward),
                       "dr_dt:", -dr_dt)
 
-            if ep_reward < -1000: ep_reward = 0
+            if ep_reward < -1000: ep_reward = -1000
             rewards.append(ep_reward)
             dr_dt = round(avg_rwd,2)
 

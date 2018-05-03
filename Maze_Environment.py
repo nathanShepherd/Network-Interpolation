@@ -60,7 +60,7 @@ class Maze():
         if self.pos['x'] == self.goal[0] and self.goal[1] == self.pos['y']:
             reward += 100; print("GOAL!!!")
 
-        return reward - (np.tanh(dist*100))**2# - np.tanh(self.counter)/100
+        return reward - (np.tanh(dist*100))*2# - np.tanh(self.counter)/100
 
     def check_if_solvable(self):
         pass# Brute force a solution if one exists
@@ -143,10 +143,10 @@ import numpy as np
 import random
 
 NUM_ACTIONS = 4
-WIDTH = 8# MAX: 30
-DEPTH = 5# MAX: 20
+WIDTH = 30# MAX: 30
+DEPTH = 20# MAX: 20
 
-EPOCHS = 500
+EPOCHS = 5000
 
 if __name__ == "__main__":
     maze = Maze(DEPTH, WIDTH)
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     obs_space = len(initial_state)
 
     bin_ranges = [WIDTH, DEPTH]
-    num_bins = 8#len(bin_ranges)
+    num_bins = max(WIDTH, DEPTH)
 
     Agent = DQN(obs_space, NUM_ACTIONS,
                 initial_state, num_bins, bin_ranges)
