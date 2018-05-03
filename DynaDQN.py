@@ -1,7 +1,7 @@
 # Categorize Continuous State Space using Binning
 # Aggregate reward in Q-Matrix using dictionary
-# Hallucinate future actions using model T
-# Hallucinate future rewards using alternative reward model R
+# Simulate future actions using model T
+# Simulate future rewards using alternative reward model R
 # Update Q-Matrix with T and R to increase sample effeciency
 # \\ \\ \\ \\
 # Developed by Nathan Shepherd
