@@ -1,6 +1,8 @@
 # Initialze a randomly ordered string using chars.
 # The maze is partially observable but static
 # --> Developed by Nathan Shepherd
+import numpy as np
+import random
 
 class Maze():
     # An environment of Strings
@@ -14,8 +16,6 @@ class Maze():
         self.freq_map = {}
         self.counter = 0
         self.init_Map()
-        
-        
 
     def init_Map(self):
         self.Map = {}; goal = [int(self.width*0.7), int(self.depth*0.7)]
@@ -101,8 +101,15 @@ class Maze():
         return [self.pos['x'], self.pos['y']], reward, terminal, info
 
     def to_string(self, binary=True):
-        outs = ""
+        outs = "  "
+        for col in range(self.depth):
+            outs += str(int(np.tanh(col/self.width)*10))
+        outs += " @ "
+        for col in range(self.depth):
+            outs += str(int(np.tanh(col/self.width)*10))
+        outs += '\n'
         for row in range(self.width):
+            outs += str(int(np.tanh(row/self.depth)*10)) + " "
             for col in range(self.depth):
                 outs += self.Map[row][col]
             outs += " | "
@@ -117,68 +124,9 @@ class Maze():
                     else: outs += '0'
             else:
                 for col in range(self.depth):
-                    outs += str(int(np.tanh(self.freq_map[row][col]/EPOCHS)*10))
+                    _max = max(self.freq_map[row])*20
+                    col = min(9, int(np.tanh(self.freq_map[row][col]/_max)*10))
+                    outs += str(col)#/EPOCHS
             outs += "\n"
         print( outs )
 
-def observe(agent, N=15):
-    [agent.play_episode(0.1, viz=True) for ep in range(N)]
-
-def plot_running_avg(reward_arr, label, step_size=75):
-    N = len(reward_arr)
-    #init unitialized array
-    # (faster than np.zeros)
-    running_avg = np.empty(N)
-
-    for t in range(step_size, N):
-        running_avg[t] = np.mean(reward_arr[t-step_size: t+1])
-
-    plt.plot(running_avg, color="purple", label="Running Avg.: "+label)
-
-import matplotlib.pyplot as plt
-from matplotlib import style
-from StringDQN import DQN
-style.use('ggplot')
-import numpy as np
-import random
-
-NUM_ACTIONS = 4
-WIDTH = 10# MAX: 30
-DEPTH = 20# MAX: 20
-
-EPOCHS = 5000
-
-'''
-TODO: Use DynaDQN (DQN.T) Variant to explore state-space more effectively
-Stabilized at -20 after 1000 iterations on a board of size [WIDTH=20, DEPTH=10]
-X+++X++XX++++X+++++X | 00040000000000000000 | 00010000000000000000
-++++++++++++X++XX+++ | 00052111000000000000 | 00010000000000000000
-++++++++X+++++X+++++ | 01158431000000000000 | 00001000000000000000
-+++XX++X++++++++++++ | 00012120000000000000 | 00000010000000000000
-+XX++++++++++X++X+X+ | 00011121000000000000 | 00000010000000000000
-+X+X++++++++X++X++++ | 00111121100000000000 | 00000010000000000000
-++++++++++++++++++X+ | 00101111100000000000 | 00000010000000000000
-++XX++++X+++++O+XXX+ | 00001111100000000000 | 00000010000000000000
-++++X+XX+++++X++++++ | 00001010000000000000 | 00001000000000000000
-++++++++++XXXX+++X++ | 00000000000000000000 | 00001000000000000000
-'''
-
-if __name__ == "__main__":
-    maze = Maze(DEPTH, WIDTH)
-    initial_state = maze.reset()
-    obs_space = len(initial_state)
-
-    bin_ranges = [[WIDTH, WIDTH], [DEPTH, DEPTH]]
-    num_bins = max(WIDTH, DEPTH)
-
-    Agent = DQN(obs_space, NUM_ACTIONS,
-                initial_state, num_bins, bin_ranges)
-    Agent.env = maze
-
-    ep_rewards = Agent.train( EPOCHS )[1:]
-    plot_running_avg(ep_rewards,'Running Avg Rwd')
-
-    maze.to_string(binary=False)
-    plt.show()
-        
-    print("Total Reward:", sum(ep_rewards))
