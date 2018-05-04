@@ -86,13 +86,14 @@ class DQN:
     def get_bins(self, num_bins):
         # Make 10 x state_depth matrix,  each column elem is range/10
         # Digitize using bins ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        ranges = [rng for rng in self.bin_ranges]
+        ranges = [rng[0] for rng in self.bin_ranges]
+        num_bins = [num[1] for num in self.bin_ranges]
 
         bins = []
         for i in range(self.obs_space):
             # use minimum value to anchor buckets
             start, stop = 0, ranges[i]
-            buckets = np.linspace(start, stop, num_bins)
+            buckets = np.linspace(start, stop, num_bins[i])
             bins.append(buckets)
         return bins
             

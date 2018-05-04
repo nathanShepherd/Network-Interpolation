@@ -143,17 +143,32 @@ import numpy as np
 import random
 
 NUM_ACTIONS = 4
-WIDTH = 30# MAX: 30
+WIDTH = 10# MAX: 30
 DEPTH = 20# MAX: 20
 
 EPOCHS = 5000
+
+'''
+TODO: Use DynaDQN (DQN.T) Variant to explore state-space more effectively
+Stabilized at -20 after 1000 iterations on a board of size [WIDTH=20, DEPTH=10]
+X+++X++XX++++X+++++X | 00040000000000000000 | 00010000000000000000
+++++++++++++X++XX+++ | 00052111000000000000 | 00010000000000000000
+++++++++X+++++X+++++ | 01158431000000000000 | 00001000000000000000
++++XX++X++++++++++++ | 00012120000000000000 | 00000010000000000000
++XX++++++++++X++X+X+ | 00011121000000000000 | 00000010000000000000
++X+X++++++++X++X++++ | 00111121100000000000 | 00000010000000000000
+++++++++++++++++++X+ | 00101111100000000000 | 00000010000000000000
+++XX++++X+++++O+XXX+ | 00001111100000000000 | 00000010000000000000
+++++X+XX+++++X++++++ | 00001010000000000000 | 00001000000000000000
+++++++++++XXXX+++X++ | 00000000000000000000 | 00001000000000000000
+'''
 
 if __name__ == "__main__":
     maze = Maze(DEPTH, WIDTH)
     initial_state = maze.reset()
     obs_space = len(initial_state)
 
-    bin_ranges = [WIDTH, DEPTH]
+    bin_ranges = [[WIDTH, WIDTH], [DEPTH, DEPTH]]
     num_bins = max(WIDTH, DEPTH)
 
     Agent = DQN(obs_space, NUM_ACTIONS,
