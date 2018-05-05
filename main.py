@@ -23,16 +23,17 @@ def use_DQN(maze, which='String'):
 
     bin_ranges = [[WIDTH, WIDTH], [DEPTH, DEPTH]]
     num_bins = max(WIDTH, DEPTH)
+    
     if which == 'String':
         Agent = StringDQN(obs_space, NUM_ACTIONS,
                 initial_state, num_bins, bin_ranges)
-    if which == 'Explore':
-        Agent = ExploreDQN(obs_space, NUM_ACTIONS,
-                initial_state, num_bins, bin_ranges)
+    if which == 'StateGreedy':
+        Agent = SGDQN(obs_space, NUM_ACTIONS,
+                      initial_state, bin_ranges)
     Agent.env = maze
 
-    ep_rewards = Agent.train( EPOCHS )[1:]
-    plt.title("String DQN Performance")
+    ep_rewards = Agent.train( EPOCHS, epsilon_min=0.01 )[1:]
+    plt.title(which + "DQN Performance")
     plt.ylabel("Reward")
     plt.xlabel("Epochs")
     plot_running_avg(ep_rewards,'Running Avg Rwd')
@@ -42,8 +43,9 @@ def use_DQN(maze, which='String'):
     plt.show()
         
     print("Total Reward:", sum(ep_rewards))
+    return Agent
 
-from ExploreDQN import DQN as ExploreDQN
+from StateGreedyDQN import DQN as SGDQN
 from StringDQN import DQN as StringDQN
 from Maze_Environment import Maze
 import matplotlib.pyplot as plt
@@ -53,15 +55,17 @@ import numpy as np
 import random
 
 NUM_ACTIONS = 4
-WIDTH = 20# MAX: 30
-DEPTH = 10# MAX: 20
+WIDTH = 20# MAX: 40
+DEPTH = 10# MAX: 30
 
 EPOCHS = 1000
 
 '''
-TODO: Use DynaDQN (DQN.T) Variant to explore state-space more effectively
-Stabilized at -20 after 1000 iterations on a board of size [WIDTH=20, DEPTH=10]
+StringDQN stabilized at -20 after 1000 iterations on a board of size [WIDTH=20, DEPTH=10]
+
+      Maze to solve | Frequency of Agent in State   Max action by row&col
   00123456677888899999 @ 00123456677888899999 @ 00123456677888899999
+  ------------------------------------------------------------------
 0 +X+++X++X++X+++++X++ | 01112242310000000000 | 00000010000000000000
 0 ++XX++++X+X+X+X++++X | 02346764421000000000 | 00000100000000000000
 0 +X++++X+++++++X++X++ | 13479964321000000000 | 00001000000000000000
@@ -72,11 +76,31 @@ Stabilized at -20 after 1000 iterations on a board of size [WIDTH=20, DEPTH=10]
 3 ++++X++X++X++XO++X+X | 13444463221100000000 | 00000010000000000000
 3 +++++X++++++++++++++ | 13344353331000000000 | 00000010000000000000
 4 X++X+X+++++X++X+++++ | 02333343321000000000 | 00000010000000000000
+
+StateGreedyDQN stabilized at 200 after <1000 iterations on a board of size [WIDTH=20, DEPTH=10]
+  00011223344555666677 @ 00011223344555666677 @ 00011223344555666677
+  ------------------------------------------------------------------
+0 X+X++XXX+XX++++X++XX | 11131899911113111111 | 00000000100000000000
+0 ++++X++++++X+++++++X | 11453999999115111111 | 00000001000000000000
+1 +X++X++++X+X+++X++X+ | 11459999989899311111 | 00000001000000000000
+2 ++++++++XXX++++X+++X | 11234335213399991111 | 00000000000010000000
+3 +X++X++X+X++++++++++ | 11222222211111191111 | 00000000000000010000
+4 +++X+X+++X++X+++++++ | 11212121111111191111 | 00000000000000010000
+5 +X+++XXXX++X+X+++XXX | 11111111111111991111 | 00000000000000110000
+6 +++++++++X++X+O+++X+ | 11111111111111111111 | 00010000000000000000
+6 XX++XX+X++X++X++++X+ | 11111111111111111111 | 00010000000000000000
+7 ++++++++++X++X+X+X++ | 11111111111111111111 | 00010010000000000000
+
+
+On board of size [WIDTH=30, DEPTH=20]
+    StateGreedy stabilized a Policy with 200 avg reward after 5000 Episodes
+    StringDQN Failed to converge
 '''
 
 if __name__ == "__main__":
     maze = Maze(DEPTH, WIDTH)
-    use_DQN(maze, "Explore")
+    Agent = use_DQN(maze, "StateGreedy")
+    
 
     
 

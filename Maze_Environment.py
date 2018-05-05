@@ -1,6 +1,13 @@
 # Initialze a randomly ordered string using chars.
 # The maze is partially observable but static
+#
+# state( O ) is the goal and worth 500 pts
+# state( + ) is a normal tile and worth -1 pts
+# state( X ) is to be avoided, worth -25 pts
+# Agent is rewarded for being closer to the goal
+#
 # --> Developed by Nathan Shepherd
+
 import numpy as np
 import random
 
@@ -48,7 +55,7 @@ class Maze():
         if self.Map[self.pos['x']][self.pos['y']] == '+':
             reward = -1
         elif self.Map[self.pos['x']][self.pos['y']] == 'X':
-            reward = -2#-25
+            reward = -10
         elif self.Map[self.pos['x']][self.pos['y']] == 'O':
             reward = 500
 
@@ -93,7 +100,7 @@ class Maze():
             else: raise TypeError# Action is greater than num_actions == 4
             
         else:
-            reward = -1; terminal = True
+            reward = -100; terminal = True
 
         if self.pos['x'] == self.goal[0] and self.goal[1] == self.pos['y']:
             reward = 300; terminal = True
@@ -102,31 +109,35 @@ class Maze():
 
     def to_string(self, binary=True):
         outs = "  "
-        for col in range(self.depth):
-            outs += str(int(np.tanh(col/self.width)*10))
+        for col in range(self.depth):# make column labels
+            outs += str(int(np.tanh(col/self.depth)*10))
         outs += " @ "
-        for col in range(self.depth):
-            outs += str(int(np.tanh(col/self.width)*10))
+        for col in range(self.depth):# make column labels
+            outs += str(int(np.tanh(col/self.depth)*10))
         outs += '\n'
-        for row in range(self.width):
-            outs += str(int(np.tanh(row/self.depth)*10)) + " "
+        for row in range(self.width):# make row labels
+            outs += str(int(np.tanh(row/self.width)*10)) + " "
             for col in range(self.depth):
                 outs += self.Map[row][col]
             outs += " | "
-            if binary:
+            if binary:# TODO: Sample from Q and select max actions
                 line = np.zeros(self.depth)
                 for col in range(self.depth):
                     line[col] = int(self.freq_map[row][col])
-                _max = max(line)
+
+                col_max = max(line)
+                row_max = max(self.freq_map[row])
+                    
                 for num in line:
-                    if num == _max:
+                    if num == row_max or num == col_max:
                         outs += '1'
                     else: outs += '0'
             else:
                 for col in range(self.depth):
                     _max = max(self.freq_map[row])*20
                     col = min(9, int(np.tanh(self.freq_map[row][col]/_max)*10))
-                    outs += str(col)#/EPOCHS
+                    if self.freq_map[row][col] > 0 and col == 0: col = 1
+                    outs += str(col)
             outs += "\n"
         print( outs )
 
