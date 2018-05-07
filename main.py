@@ -55,10 +55,10 @@ import numpy as np
 import random
 
 NUM_ACTIONS = 4
-WIDTH = 20# MAX: 40
+WIDTH = 75# MAX: 40
 DEPTH = 10# MAX: 30
 
-EPOCHS = 1000
+EPOCHS = 10**5
 
 '''
 StringDQN stabilized at -20 after 1000 iterations on a board of size [WIDTH=20, DEPTH=10]

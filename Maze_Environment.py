@@ -107,20 +107,31 @@ class Maze():
             
         return [self.pos['x'], self.pos['y']], reward, terminal, info
 
-    def to_string(self, binary=True):
+    def to_string(self, config=['maze','freq'], binary=False):
         outs = "  "
         for col in range(self.depth):# make column labels
-            outs += str(int(np.tanh(col/self.depth)*10))
+            if 'freq' in config:
+                outs += str(int(np.tanh(col/self.depth)*10))
         outs += " @ "
         for col in range(self.depth):# make column labels
-            outs += str(int(np.tanh(col/self.depth)*10))
+            if 'maze' in config:
+                outs += str(int(np.tanh(col/self.depth)*10))
         outs += '\n'
+        
         for row in range(self.width):# make row labels
             outs += str(int(np.tanh(row/self.width)*10)) + " "
             for col in range(self.depth):
-                outs += self.Map[row][col]
+                if 'maze' in config:
+            
+                    if row == int(self.width*0.2) and col == int(self.depth*0.2):
+                        outs += '&'
+                    else:
+                        outs += self.Map[row][col]
+
             outs += " | "
-            if binary:# TODO: Sample from Q and select max actions
+            
+            if binary and 'freq' in config:
+                # TODO: Sample from Q and select max actions
                 line = np.zeros(self.depth)
                 for col in range(self.depth):
                     line[col] = int(self.freq_map[row][col])
@@ -132,7 +143,7 @@ class Maze():
                     if num == row_max or num == col_max:
                         outs += '1'
                     else: outs += '0'
-            else:
+            elif 'freq' in config:
                 for col in range(self.depth):
                     _max = max(self.freq_map[row])*20
                     col = min(9, int(np.tanh(self.freq_map[row][col]/_max)*10))

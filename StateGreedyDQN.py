@@ -202,7 +202,7 @@ class DQN:
                     self.Policy['rewards'] = reward_arr
                     self.Policy['states'] = state_arr
 
-            if ep % 1 == 0:
+            if ep % 100 == 0:
                 avg_rwd = round(np.mean(rewards),3)
                 dr_dt = round(abs(dr_dt) - abs(avg_rwd), 2)
                 print("Ep: {} | {}".format(ep, epochs),
